@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('warehouses', function (Blueprint $table) {
+        Schema::create('bins', function (Blueprint $table) {
             $table->id();
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->constrained('users');
             $table->foreignId('deleted_by')->constrained('users');
-            $table->foreignId('company_id')->constrained('companies');
+            $table->foreignId('column_id')->constrained('columns');
             $table->string('name');
+            $table->unsignedTinyInteger('level');
+            $table->boolean('is_full')->default(0);
             $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('warehouses');
+        Schema::dropIfExists('bins');
     }
 };

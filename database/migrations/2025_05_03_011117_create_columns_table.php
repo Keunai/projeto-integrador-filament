@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bins', function (Blueprint $table) {
+        Schema::create('columns', function (Blueprint $table) {
             $table->id();
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->constrained('users');
-            $table->foreignId('street_id')->constrained('streets');
+            $table->foreignId('deleted_by')->constrained('users');
+            $table->foreignId('shelf_by')->constrained('shelves');
             $table->string('name');
             $table->text('description')->nullable();
             $table->timestamps();
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bins');
+        Schema::dropIfExists('columns');
     }
 };

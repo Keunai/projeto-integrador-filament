@@ -11,12 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('levels', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->constrained('users');
-            $table->foreignId('bin_id')->constrained('bins');
+            $table->foreignId('deleted_by')->constrained('users');
+            $table->foreignId('category_id')->constrained('categories');
+            $table->morphs('locationable');
             $table->string('name');
+            $table->unsignedSmallInteger('rotation');
+            $table->enum('type', array_keys(\App\Enums\ProductTypes::getDescriptiveValues()));
+            $table->unsignedSmallInteger('amount');
+            $table->string('code');
             $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -28,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('levels');
+        Schema::dropIfExists('products');
     }
 };

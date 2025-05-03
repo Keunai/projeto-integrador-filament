@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('zones', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('created_by')->constrained('users');
+            $table->foreignId('updated_by')->constrained('users');
+            $table->foreignId('deleted_by')->constrained('users');
+            $table->foreignId('warehouse_id')->constrained('warehouses');
+            $table->foreignId('zone_id')->nullable()->constrained('zones');
+            $table->string('name');
+            $table->text('description')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
