@@ -5,8 +5,9 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use Illuminate\Support\Facades\Route;
 
+
 Route::get('/', function () {
-    return view('welcome');
+    return to_route('filament.auth.login');
 })->name('home');
 
 Route::view('dashboard', 'dashboard')

@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable, SoftDeletes;
 
@@ -51,5 +53,22 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        if ($panel->getId() === 'admin') {
+            return auth()->user()->role->id === 1 && $this->hasVerifiedEmail();
+        }
+
+        if ($panel->getId() === 'manager') {
+            return auth()->user()->role->id === 2 && $this->hasVerifiedEmail();
+        }
+
+        if ($panel->getId() === 'staff') {
+            return auth()->user()->role->id === 3 && $this->hasVerifiedEmail();
+        }
+
+        return false;
     }
 }
