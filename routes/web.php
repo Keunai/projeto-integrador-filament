@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', function () {
-    return redirect()->route('filament.admin.auth.login');
+    return redirect()->route('filament.auth.login');
 })->name('home');
 
 Route::view('dashboard', 'dashboard')
