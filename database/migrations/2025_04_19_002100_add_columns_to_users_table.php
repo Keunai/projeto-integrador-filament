@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('created_by')->after('id')->constrained('users');
-            $table->foreignId('updated_by')->after('created_by')->constrained('users');
+            $table->foreignId('created_by')->after('id')->nullable()->constrained('users');
+            $table->foreignId('updated_by')->after('created_by')->nullable()->constrained('users');
             $table->foreignId('company_id')->after('updated_by')->constrained('companies');
-            $table->foreignId('role_id')->after('company_id')->constrained('roles');
+            $table->foreignId('role_id')->after('company_id')->nullable()->constrained('roles');
             $table->boolean('active')->default(1)->after('role_id');
             $table->text('responsabilities')->nullable()->after('active');
             $table->softDeletes()->after('updated_at');

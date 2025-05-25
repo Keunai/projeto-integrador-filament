@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Livewire\Auth\Login;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -21,6 +22,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -28,12 +30,9 @@ class AdminPanelProvider extends PanelProvider
             ->path('')
             ->login()
             ->brandLogo(asset('/images/logo.png'))
-            ->darkModeBrandLogo('/images/logo-dark.png')
+            ->darkModeBrandLogo(asset('/images/logo-dark.png'))
             ->brandLogoHeight('8rem')
-            ->favicon('/images/favicon.png')
-            ->passwordReset()
-            ->emailVerification()
-            ->profile()
+            ->favicon(asset('/images/favicon.png'))
             ->colors([
                 'primary' => Color::Red,
             ])
@@ -44,7 +43,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
