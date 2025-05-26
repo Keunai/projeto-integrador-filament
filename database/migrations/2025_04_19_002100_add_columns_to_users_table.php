@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('company_id')->after('updated_by')->constrained('companies');
             $table->foreignId('role_id')->after('company_id')->nullable()->constrained('roles');
             $table->boolean('active')->default(1)->after('role_id');
-            $table->text('responsabilities')->nullable()->after('active');
             $table->softDeletes()->after('updated_at');
         });
     }
@@ -37,7 +36,6 @@ return new class extends Migration
             $table->dropForeign(['role_id']);
             $table->dropColumn('role_id');
             $table->dropColumn('active');
-            $table->dropColumn('responsabilities');
             $table->dropSoftDeletes();
         });
     }

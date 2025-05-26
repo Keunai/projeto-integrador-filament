@@ -3,10 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Company;
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
         $company = Company::find(1);
         $role = Role::find(1);
 
-        User::updateOrCreate(
+        $user = User::updateOrCreate(
             ['company_id' => $company->id],
             [
                 'role_id' => $role->id,
@@ -27,5 +27,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('tenantAdm'),
             ]
         );
+
+        $user->assignRole('Administrador');
     }
 }

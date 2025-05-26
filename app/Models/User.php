@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes, HasRoles;
+
+    protected $guard_name = 'web';
 
     protected $fillable = [
         'name',
@@ -20,7 +23,6 @@ class User extends Authenticatable implements FilamentUser
         'created_by',
         'updated_by',
         'company_id',
-        'role_id',
         'active',
         'responsabilities',
     ];
@@ -50,25 +52,12 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsTo(Company::class);
     }
 
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
-    }
-
     public function canAccessPanel(Panel $panel): bool
     {
-        if ($panel->getId() === 'admin') {
-            return auth()->user()->role->id === 1 && $this->hasVerifiedEmail();
-        }
-
-        if ($panel->getId() === 'manager') {
-            return auth()->user()->role->id === 2 && $this->hasVerifiedEmail();
-        }
-
-        if ($panel->getId() === 'staff') {
-            return auth()->user()->role->id === 3 && $this->hasVerifiedEmail();
-        }
-
-        return false;
+        return match ($panel->getId()) {
+            'admin' => $this->hasRole('Administrador'),
+            'hr' => $this->hasRole('RH'),
+            default => false,
+        };
     }
 }
