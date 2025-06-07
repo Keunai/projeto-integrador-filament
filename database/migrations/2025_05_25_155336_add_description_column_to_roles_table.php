@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('roles', function (Blueprint $table) {
-            $table->text('description')->nullable();
+            $table->text('description')->nullable()->after('guard_name');
+            $table->foreignId('created_by')->nullable()->after('id')->constrained('users');
+            $table->foreignId('updated_by')->nullable()->after('created_by')->constrained('users');
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('roles', function (Blueprint $table) {
-            $table->dropColumn('description');
+            $table->dropForeign(['created_by']);
+            $table->dropForeign(['updated_by']);
+            $table->dropColumn(['description', 'created_by', 'altered_by']);
         });
     }
 };

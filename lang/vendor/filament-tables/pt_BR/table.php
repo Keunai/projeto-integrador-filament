@@ -54,7 +54,7 @@ return [
         'heading' => 'Resumo',
 
         'subheadings' => [
-            'all' => 'Todos :label',
+            'all' => 'Todos as páginas',
             'group' => ':group resumo',
             'page' => 'Esta página',
         ],

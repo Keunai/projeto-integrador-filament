@@ -8,6 +8,8 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\Summarizers\Count;
+use Filament\Tables\Columns\Summarizers\Summarizer;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,7 +23,9 @@ class RoleResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $modelLabel = 'funções';
+    protected static ?string $modelLabel = 'Função';
+
+    protected static ?string $pluralLabel = 'Funções';
 
     protected static ?string $navigationIcon = 'sui-hierarchy';
 
@@ -37,14 +41,17 @@ class RoleResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->label('Nome')
                     ->required()
+                    ->unique(ignoreRecord: true)
                     ->maxLength(255),
+
                 Forms\Components\Select::make('permissions')
                     ->label('Permissões')
-                    ->options([
-                        Permission::all()->pluck('name', 'id')->toArray()
-                    ])
+                    ->required()
+                    ->relationship('permissions', 'name')
                     ->multiple()
-                    ->required(),
+                    ->preload()
+                    ->searchable(),
+
                 Forms\Components\Textarea::make('description')
                     ->label('Descrição')
                     ->columnSpanFull(),
@@ -54,26 +61,35 @@ class RoleResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->pluralModelLabel('Funções')
             ->columns([
                 TextColumn::make('name')
                     ->label('Nome')
                     ->searchable(),
+
                 TextColumn::make('description')
-                    ->label('Descrição'),
-                TextColumn::make('created_by')
-                    ->label('Criado por')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Descrição')
+                    ->summarize(Count::make()),
+
                 TextColumn::make('updated_by')
                     ->label('Alterado por')
+                    ->placeholder('Ubiko')
                     ->sortable(),
-                TextColumn::make('created_at')
-                    ->label('Data de Criação')
+
+                TextColumn::make('updated_at')
+                    ->label('Última Alteração')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->label('Última Alteração')
+
+                TextColumn::make('created_by')
+                    ->label('Criado por')
+                    ->sortable()
+                    ->placeholder('Ubiko')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('created_at')
+                    ->label('Data de Criação')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -82,6 +98,7 @@ class RoleResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
