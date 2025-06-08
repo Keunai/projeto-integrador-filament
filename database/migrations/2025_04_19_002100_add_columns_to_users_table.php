@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->foreignId('created_by')->after('id')->nullable()->constrained('users');
             $table->foreignId('updated_by')->after('created_by')->nullable()->constrained('users');
-            $table->foreignId('company_id')->after('updated_by')->constrained('companies');
-            $table->foreignId('role_id')->after('company_id')->nullable()->constrained('roles');
+            $table->foreignId('deleted_by')->after('updated_by')->nullable()->constrained('users');
+            $table->foreignId('role_id')->after('deleted_by')->nullable()->constrained('roles');
             $table->boolean('active')->default(1)->after('role_id');
             $table->softDeletes()->after('updated_at');
         });
@@ -31,8 +31,8 @@ return new class extends Migration
             $table->dropColumn('created_by');
             $table->dropForeign(['updated_by']);
             $table->dropColumn('updated_by');
-            $table->dropForeign(['company_id']);
-            $table->dropColumn('company_id');
+            $table->dropForeign(['deleted_by']);
+            $table->dropColumn('deleted_by');
             $table->dropForeign(['role_id']);
             $table->dropColumn('role_id');
             $table->dropColumn('active');

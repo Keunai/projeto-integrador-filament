@@ -14,7 +14,6 @@ class Warehouse extends Model
         'created_by',
         'updated_by',
         'deleted_by',
-        'company_id',
         'name',
         'description',
     ];
@@ -32,10 +31,5 @@ class Warehouse extends Model
     public function deleter()
     {
         return $this->belongsTo(User::class, 'deleted_by');
-    }
-
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
     }
 }

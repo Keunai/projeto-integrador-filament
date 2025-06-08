@@ -22,7 +22,6 @@ class User extends Authenticatable implements FilamentUser
         'password',
         'created_by',
         'updated_by',
-        'company_id',
         'active',
         'responsabilities',
     ];
@@ -45,11 +44,6 @@ class User extends Authenticatable implements FilamentUser
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
-    }
-
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
     }
 
     public function canAccessPanel(Panel $panel): bool

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->constrained('users');
-            $table->foreignId('deleted_by')->constrained('users');
+            $table->foreignId('deleted_by')->nullable()->constrained('users');
             $table->foreignId('warehouse_id')->constrained('warehouses');
             $table->string('name');
             $table->text('description')->nullable();

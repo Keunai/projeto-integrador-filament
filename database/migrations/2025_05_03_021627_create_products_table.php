@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->constrained('users');
-            $table->foreignId('deleted_by')->constrained('users');
+            $table->foreignId('deleted_by')->nullable()->constrained('users');
             $table->foreignId('category_id')->constrained('categories');
             $table->morphs('locationable');
             $table->string('name');
