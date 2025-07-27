@@ -9,17 +9,12 @@ use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
-
     public function run(): void
     {
-        $role = Role::find(1);
-
         $user = User::updateOrCreate(
-            ['role_id' => $role->id],
+            ['email' => 'tenantAdm@gmail.com'],
             [
-
                 'name' => 'tenantAdm',
-                'email' => 'tenantAdm@gmail.com',
                 'password' => Hash::make('tenantAdm'),
             ]
         );

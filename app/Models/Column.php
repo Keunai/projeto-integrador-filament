@@ -38,4 +38,16 @@ class Column extends Model
     {
         return $this->belongsTo(Shelf::class, 'shelf_by');
     }
+
+    protected static function booted()
+    {
+        static::creating(fn ($model) => $model->created_by = auth()->user()?->id);
+        static::updating(fn ($model) => $model->updated_by = auth()->user()?->id);
+        static::deleting(function ($model) {
+            if (in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive(static::class))) {
+                $model->forceFill(['deleted_by' => auth()->user()?->id])
+                    ->save();
+            }
+        });
+    }
 }

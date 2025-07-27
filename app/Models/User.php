@@ -22,6 +22,7 @@ class User extends Authenticatable implements FilamentUser
         'password',
         'created_by',
         'updated_by',
+        'deleted_by',
         'active',
         'responsabilities',
     ];
@@ -34,24 +35,37 @@ class User extends Authenticatable implements FilamentUser
     protected $casts = [
         'email_verified_at' => 'datetime',
         'active' => 'boolean',
+        'password' => 'hashed',
     ];
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $panel->getId() === 'admin' && auth()->check();
+    }
 
     public function creator()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(self::class, 'created_by');
     }
 
     public function updater()
     {
-        return $this->belongsTo(User::class, 'updated_by');
+        return $this->belongsTo(self::class, 'updated_by');
     }
 
-    public function canAccessPanel(Panel $panel): bool
+    public function remover() {
+        return $this->belongsTo(self::class, 'deleted_by');
+    }
+
+    protected static function booted()
     {
-        return match ($panel->getId()) {
-            'admin' => $this->hasRole('Administrador'),
-            'hr' => $this->hasRole('RH'),
-            default => false,
-        };
+        static::creating(fn ($model) => $model->created_by = auth()->user()?->id);
+        static::updating(fn ($model) => $model->updated_by = auth()->user()?->id);
+        static::deleting(function ($model) {
+            if (in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive(static::class))) {
+                $model->forceFill(['deleted_by' => auth()->user()?->id])
+                    ->save();
+            }
+        });
     }
 }

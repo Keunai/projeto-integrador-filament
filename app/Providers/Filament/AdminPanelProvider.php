@@ -25,7 +25,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('')
             ->login()
-            ->brandLogo(asset('/images/giant-logo-CBSI70.png'))
+            ->brandLogo(asset('/images/Ubiko_CBSI-removebg-preview (1).png'))
             ->brandLogoHeight('50px')
             ->favicon(asset('/images/giant-logo-CBSI32.png'))
             ->colors([

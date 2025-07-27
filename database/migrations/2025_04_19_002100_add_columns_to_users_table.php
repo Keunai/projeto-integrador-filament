@@ -15,8 +15,7 @@ return new class extends Migration
             $table->foreignId('created_by')->after('id')->nullable()->constrained('users');
             $table->foreignId('updated_by')->after('created_by')->nullable()->constrained('users');
             $table->foreignId('deleted_by')->after('updated_by')->nullable()->constrained('users');
-            $table->foreignId('role_id')->after('deleted_by')->nullable()->constrained('roles');
-            $table->boolean('active')->default(1)->after('role_id');
+            $table->boolean('active')->default(1)->after('deleted_by');
             $table->softDeletes()->after('updated_at');
         });
     }
@@ -33,8 +32,6 @@ return new class extends Migration
             $table->dropColumn('updated_by');
             $table->dropForeign(['deleted_by']);
             $table->dropColumn('deleted_by');
-            $table->dropForeign(['role_id']);
-            $table->dropColumn('role_id');
             $table->dropColumn('active');
             $table->dropSoftDeletes();
         });

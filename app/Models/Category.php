@@ -28,8 +28,9 @@ class Category extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    public function deleter()
+    protected static function booted()
     {
-        return $this->belongsTo(User::class, 'deleted_by');
+        static::creating(fn ($model) => $model->created_by = auth()->user()?->id);
+        static::updating(fn ($model) => $model->updated_by = auth()->user()?->id);
     }
 }

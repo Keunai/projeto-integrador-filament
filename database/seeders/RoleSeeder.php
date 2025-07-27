@@ -19,13 +19,16 @@ class RoleSeeder extends Seeder
         $usersPermission = Permission::firstOrCreate(['name' => 'Gerenciar Usuários']);
         $warehousePermission = Permission::firstOrCreate(['name' => 'Gerenciar Armazéns']);
         $productsPermission = Permission::firstOrCreate(['name' => 'Gerenciar Produtos']);
-        $categoriesPermission = Permission::firstOrCreate(['name' => 'Gerenciar Categorias']);
+        $categoriesPermission = Permission::firstOrCreate(['name' => 'Gerenciar Categorias de Produtos']);
         $movementsPermission = Permission::firstOrCreate(['name' => 'Gerenciar Movimentações']);
         $roomLocationsPermission = Permission::firstOrCreate(['name' => 'Gerenciar Localizações de Salas']);
         $roomsPermission = Permission::firstOrCreate(['name' => 'Gerenciar Salas']);
         $shelvesPermission = Permission::firstOrCreate(['name' => 'Gerenciar Prateleiras']);
         $streetsPermission = Permission::firstOrCreate(['name' => 'Gerenciar Ruas']);
+        $binsPermission = Permission::firstOrCreate(['name' => 'Gerenciar Blocos']);
         $zonesPermission = Permission::firstOrCreate(['name' => 'Gerenciar Zonas']);
+        $statusPermission = Permission::firstOrCreate(['name' => 'Gerenciar Status']);
+        $columnsPermission = Permission::firstOrCreate(['name' => 'Gerenciar Colunas']);
 
         $adminRole = Role::updateOrCreate(
             ['name' => 'Administrador', 'guard_name' => $guardName],
@@ -59,6 +62,9 @@ class RoleSeeder extends Seeder
             $shelvesPermission,
             $streetsPermission,
             $zonesPermission,
+            $statusPermission,
+            $binsPermission,
+            $columnsPermission,
         ]);
 
         $managerRole->givePermissionTo([
@@ -71,6 +77,8 @@ class RoleSeeder extends Seeder
             $shelvesPermission,
             $streetsPermission,
             $zonesPermission,
+            $binsPermission,
+            $columnsPermission,
         ]);
 
         $staffRole->givePermissionTo([
