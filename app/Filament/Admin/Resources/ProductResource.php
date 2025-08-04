@@ -15,6 +15,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\MorphToSelect;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -63,10 +64,12 @@ class ProductResource extends Resource
 
                 MorphToSelect::make('locationable')
                     ->types([
-                        MorphToSelect\Type::make(Bin::class)
+                        MorphToSelect\Type::make(\App\Models\Bin::class)
                             ->label('Bloco')
-                            ->titleAttribute('name'),
-                        MorphToSelect\Type::make(RoomLocation::class)
+                            ->titleAttribute('name')
+                            ->getOptionsUsing(fn () => \App\Models\Bin::query()->where('is_full', 0)->pluck('name', 'id')),
+
+                        MorphToSelect\Type::make(\App\Models\RoomLocation::class)
                             ->label('Local de Sala')
                             ->titleAttribute('description'),
                     ])
@@ -92,7 +95,7 @@ class ProductResource extends Resource
                     ->maxLength(255),
 
                 TextInput::make('amount')
-                    ->label(fn (callable $get) => $get('type') === \App\Enums\ProductTypes::UNIT ? 'Quantidade (sempre 1)' : 'Quantidade Total de Unidades no Lote')
+                    ->label(fn (callable $get) => $get('type') === \App\Enums\ProductTypes::UNIT ? 'Quantidade' : 'Quantidade Total de Unidades no Lote')
                     ->numeric()
                     ->required()
                     ->minValue(0)
@@ -159,7 +162,9 @@ class ProductResource extends Resource
                             ->types([
                                 MorphToSelect\Type::make(Bin::class)
                                     ->label('Bloco')
-                                    ->titleAttribute('name'),
+                                    ->titleAttribute('name')
+                                    ->getOptionsUsing(fn () => \App\Models\Bin::query()->where('is_full', 0)->pluck('name', 'id')),
+
                                 MorphToSelect\Type::make(RoomLocation::class)
                                     ->label('Local de Sala')
                                     ->titleAttribute('description'),
@@ -198,13 +203,13 @@ class ProductResource extends Resource
                 TextColumn::make('name')
                     ->label('Nome')
                     ->sortable()
-                    ->summarize(Count::make())
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('code')
                     ->label('Código')
                     ->sortable()
+                    ->summarize(Count::make())
                     ->searchable(),
 
                 TextColumn::make('amount')

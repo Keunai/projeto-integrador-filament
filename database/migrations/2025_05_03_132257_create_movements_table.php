@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('updated_by')->constrained('users');
             $table->foreignId('deleted_by')->nullable()->constrained('users');
             $table->foreignId('product_id')->constrained('products');
-            $table->morphs('origin_loc');
-            $table->morphs('destiny_loc');
+            $table->nullableMorphs('origin_loc');
+            $table->nullableMorphs('destiny_loc');
             $table->enum('type', array_keys(\App\Enums\MovementTypes::getDescriptiveValues()));
             $table->timestamps();
             $table->softDeletes();
