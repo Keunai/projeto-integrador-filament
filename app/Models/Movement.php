@@ -21,6 +21,7 @@ class Movement extends Model
         'destiny_loc_type',
         'destiny_loc_id',
         'type',
+        'amount',
     ];
 
     /**

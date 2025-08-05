@@ -12,6 +12,7 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\MorphToSelect;
 use Filament\Forms\Components\MorphToSelect\Type;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Table;
@@ -38,22 +39,50 @@ class MovementResource extends Resource
     public static function form(\Filament\Forms\Form $form): \Filament\Forms\Form
     {
         return $form->schema([
-            Hidden::make('created_by')->default(fn () => auth()->id()),
-            Hidden::make('updated_by')->default(fn () => auth()->id()),
+            Hidden::make('created_by')->default(fn() => auth()->id()),
+            Hidden::make('updated_by')->default(fn() => auth()->id()),
             Hidden::make('origin_loc_type'),
             Hidden::make('origin_loc_id'),
 
             Select::make('product_id')
-                ->relationship('product', 'code')
                 ->label('Produto')
                 ->required()
+                ->reactive()
+                ->options(function () {
+                    return \App\Models\Product::where(function ($query) {
+                        $query
+                            ->where('amount', '>', 0);
+                    })
+                        ->pluck('code', 'id');
+                })
                 ->afterStateUpdated(function ($state, callable $set) {
                     $product = \App\Models\Product::find($state);
 
                     if ($product) {
                         $set('origin_loc_type', $product->locationable_type);
                         $set('origin_loc_id', $product->locationable_id);
+                        $set('max_product_amount', $product->amount);
                     }
+                }),
+
+            Hidden::make('max_product_amount'),
+
+            TextInput::make('amount')
+                ->label('Quantidade')
+                ->required()
+                ->numeric()
+                ->minValue(1)
+                ->default(1)
+                ->visible(fn(callable $get) => ($get('max_product_amount') ?? 0) > 1)
+                ->helperText(fn(callable $get) => 'Máximo disponível: ' . ($get('max_product_amount') ?? 0))
+                ->rule(function (callable $get) {
+                    return function ($attribute, $value, $fail) use ($get) {
+                        $max = $get('max_product_amount') ?? 0;
+
+                        if ($value > $max) {
+                            $fail('A quantidade excede o estoque atual.');
+                        }
+                    };
                 }),
 
             Select::make('type')
@@ -70,14 +99,14 @@ class MovementResource extends Resource
                     MorphToSelect\Type::make(Bin::class)
                         ->label('Bloco')
                         ->titleAttribute('name')
-                        ->getOptionsUsing(fn () => \App\Models\Bin::query()->where('is_full', false)->pluck('name', 'id')),
+                        ->getOptionsUsing(fn() => \App\Models\Bin::query()->where('is_full', false)->pluck('name', 'id')),
 
                     MorphToSelect\Type::make(RoomLocation::class)
                         ->label('Local de Sala')
                         ->titleAttribute('description'),
                 ])
                 ->label('Localização de Destino')
-                ->visible(fn (callable $get) => $get('type') !== 'exit')
+                ->visible(fn(callable $get) => $get('type') !== 'exit')
                 ->required(),
         ]);
     }
@@ -104,12 +133,12 @@ class MovementResource extends Resource
                 TextColumn::make('type')
                     ->label('Tipo')
                     ->badge()
-                    ->color(fn (string $state) => match ($state) {
+                    ->color(fn(string $state) => match ($state) {
                         'entry' => 'success',
                         'intern' => 'warning',
                         'exit' => 'danger',
                     })
-                    ->formatStateUsing(fn (string $state) => MovementTypes::getDescriptiveValues()[$state] ?? $state),
+                    ->formatStateUsing(fn(string $state) => MovementTypes::getDescriptiveValues()[$state] ?? $state),
 
                 TextColumn::make('creator.name')
                     ->label('Criado Por')
@@ -140,6 +169,7 @@ class MovementResource extends Resource
     {
         return [
             'index' => ListMovements::route('/'),
+            'create' => \App\Filament\Admin\Resources\MovementResource\Pages\CreateMovement::route('/create'),
         ];
     }
 }

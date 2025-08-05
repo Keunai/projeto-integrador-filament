@@ -20,6 +20,7 @@ return new class extends Migration
             $table->nullableMorphs('origin_loc');
             $table->nullableMorphs('destiny_loc');
             $table->enum('type', array_keys(\App\Enums\MovementTypes::getDescriptiveValues()));
+            $table->unsignedInteger('amount')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

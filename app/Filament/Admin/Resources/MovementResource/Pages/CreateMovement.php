@@ -12,15 +12,28 @@ class CreateMovement extends CreateRecord
 {
     protected static string $resource = MovementResource::class;
 
-    protected function mutateFormDataBeforeCreate(array $data): array
+    protected function afterCreate(): void
     {
-        $product = Product::find($data['product_id']);
+        /** @var Movement $movement */
+        $movement = $this->record;
 
-        dd($product->locationable_type, $product->locationable_id);
+        $product = Product::find($movement->product_id);
 
-        $data['origin_loc_type'] = $product->locationable_type;
-        $data['origin_loc_id'] = $product->locationable_id;
+        if (!$movement->origin_loc_type || !$movement->origin_loc_id) {
+            $movement->origin_loc_type = $product->locationable_type;
+            $movement->origin_loc_id = $product->locationable_id;
+            $movement->save();
+        }
 
-        return $data;
+        if ($movement->type === 'exit') {
+            $product->amount = max(0, $product->amount - ($movement->amount ?? 1));
+            $product->save();
+        }
+
+        if ($movement->type === 'intern' && $movement->destinyLoc) {
+            $product->locationable_type = get_class($movement->destinyLoc);
+            $product->locationable_id = $movement->destinyLoc->id;
+            $product->save();
+        }
     }
 }
