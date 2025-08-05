@@ -130,6 +130,12 @@ class MovementResource extends Resource
                     ->sortable()
                     ->placeholder('Não se aplica'),
 
+                TextColumn::make('amount')
+                    ->label('Quantidade')
+                    ->sortable()
+                    ->numeric()
+                    ->placeholder('Não se aplica'),
+
                 TextColumn::make('type')
                     ->label('Tipo')
                     ->badge()

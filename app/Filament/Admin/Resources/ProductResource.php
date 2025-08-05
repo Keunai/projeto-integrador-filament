@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources;
 
+use App\Filament\Imports\ProductImporter;
 use App\Filament\Admin\Resources\ProductResource\Pages;
 use App\Models\Bin;
 use App\Models\Category;
@@ -22,6 +23,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Columns\Summarizers\Count;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -194,6 +196,10 @@ class ProductResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+                ImportAction::make()
+                    ->importer(ProductImporter::class)
+                    ])
             ->columns([
                 TextColumn::make('type')
                     ->label('Tipo de Registro')
