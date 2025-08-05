@@ -63,8 +63,8 @@ class RoomLocationResource extends Resource
                     ->searchable()
                     ->placeholder('Não se aplica'),
 
-                TextColumn::make('description')
-                    ->label('Descrição')
+                TextColumn::make('name')
+                    ->label('Nome')
                     ->limit(50)
                     ->toggleable(isToggledHiddenByDefault: true),
 
