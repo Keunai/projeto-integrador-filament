@@ -25,31 +25,37 @@ class ProductImporter extends Importer
         return [
             ImportColumn::make('type')->requiredMapping()->label('Tipo'),
             ImportColumn::make('code')->requiredMapping()->label('Código'),
-            ImportColumn::make('name')->label('Nome'),
+            ImportColumn::make('name')->requiredMapping()->label('Nome'),
             ImportColumn::make('amount')->numeric()->label('Quantidade'),
             ImportColumn::make('description')->label('Descrição'),
-            ImportColumn::make('category')->requiredMapping()->label('Categoria'),
-            ImportColumn::make('locationable')->requiredMapping()->label('Localização'),
-            ImportColumn::make('status')->label('Status'),
+            ImportColumn::make('category')
+                ->label('Categoria')
+                ->relationship('category', 'name'),
+            ImportColumn::make('locationable')
+                ->label('Localização')
+                ->requiredMapping()
+                ->relationship('locationable', 'name'),
+            ImportColumn::make('status')
+                ->label('Status')
+                ->relationship('status', 'name'),
         ];
     }
 
-    public function resolveRecord(): ?Model
+    public function resolveRecord(): ?Product
     {
         try {
-            $category = Category::where('name', $this->data['category'])->first();
-            $status = Status::where('name', $this->data['status'])->first();
+            $category = Category::where('name', $this->data['category'] ?? null)->first();
+            $status = Status::where('name', $this->data['status'] ?? null)->first();
 
-            $locationableName = $this->data['locationable'] ?? null;
-            $locationable = Bin::where('name', $locationableName)->first()
-                ?? RoomLocation::where('name', $locationableName)->first();
+            $locationable = Bin::where('name', $this->data['locationable'] ?? null)->first()
+                ?? RoomLocation::where('name', $this->data['locationable'] ?? null)->first();
 
             if (! $category) {
                 throw new RowImportFailedException("Categoria '{$this->data['category']}' não encontrada.");
             }
 
             if (! $locationable) {
-                throw new RowImportFailedException("Localização '{$locationableName}' não encontrada.");
+                throw new RowImportFailedException("Localização '{$this->data['locationable']}' não encontrada.");
             }
 
             $product = Product::firstOrNew([
@@ -66,21 +72,14 @@ class ProductImporter extends Importer
             $product->status_id = $status?->id ?? null;
             $product->created_by = auth()->id();
             $product->updated_by = auth()->id();
-            $product->save();
 
             return $product;
 
         } catch (\Throwable $e) {
-            throw new RowImportFailedException("Erro ao importar produto '{$this->data['code']}': " . $e->getMessage());
+            throw new RowImportFailedException(
+                "Erro ao importar produto '{$this->data['code']}': " . $e->getMessage()
+            );
         }
-    }
-
-    public function afterImport(): void
-    {
-        Notification::make()
-            ->title('Importação concluída!')
-            ->success()
-            ->send();
     }
 
     public static function getCompletedNotificationBody(Import $import): string
